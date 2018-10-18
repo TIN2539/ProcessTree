@@ -42,7 +42,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -55,7 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -63,7 +62,21 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Marshaling\ProcessInformation.cs" />
+    <Compile Include="Marshaling\SecurityAttributes.cs" />
+    <Compile Include="Marshaling\StartupInfo.cs" />
+    <Compile Include="Models\ProcessTree.cs" />
+    <Compile Include="Marshaling\NativeMethods.cs" />
+    <Compile Include="Marshaling\ProcessEntry32.cs" />
+    <Compile Include="Marshaling\SnapshotFlags.cs" />
+    <Compile Include="Utilities\Command.cs" />
+    <Compile Include="Utilities\DelegateCommand.cs" />
+    <Compile Include="ViewModels\BindableTreeView.cs" />
+    <Compile Include="ViewModels\IProcessTreeManager.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ProcessTreeManager.cs" />
+    <Compile Include="ViewModels\ViewModel.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -94,5 +107,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
