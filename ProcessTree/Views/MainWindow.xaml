@@ -3,7 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:ProcessTree.Models"
         xmlns:ViewModel="clr-namespace:ProcessTree.ViewModels"
-        Title="MainWindow" Height="450" Width="450">
+        Title="Processes"
+        WindowStartupLocation="CenterScreen"
+        Height="450" 
+        Width="450">
     <Window.Resources>
         <HierarchicalDataTemplate DataType="{x:Type local:ProcessTree}" ItemsSource="{Binding Path=ChildTree}">
             <StackPanel Orientation="Horizontal">
