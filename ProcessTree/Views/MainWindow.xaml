@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
         <ViewModel:BindableTreeView
             Grid.Row="0"
-            ItemsSource="{Binding Path=ProcessTrees}"
+            ItemsSource="{Binding Path=ProcessesTree}"
             BindableSelectedItem="{Binding Path=SelectedProcess, Mode=TwoWay}"/>
         <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>

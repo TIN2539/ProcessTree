@@ -1,44 +1,82 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using ProcessTree.Models;
 
 namespace ProcessTree.ViewModels
 {
     public class ProcessTreeManager : IProcessTreeManager
     {
-        private ICollection<uint> parrentIds = new List<uint>();
         private ICollection<Models.ProcessTree> processTrees = new ObservableCollection<Models.ProcessTree>();
+        private ICollection<Models.ProcessTree> allProcesses = new List<Models.ProcessTree>();
 
-        public ProcessTreeManager()
-        {
-            CreateTree();
-        }
-
-        public bool AddChildProcessTree(uint parrentId, Models.ProcessTree processTree)
-        {
-            foreach (var tree in processTrees)
-            {
-                if (tree.ParrentId == parrentId)
-                {
-                    tree.ChildTree.Add(processTree);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void AddParrentId(uint parrentId)
-        {
-            parrentIds.Add(parrentId);
-        }
-
-        public void AddProcessTree(Models.ProcessTree processTree)
-        {
-            processTrees.Add(processTree);
-        }
 
         public void CreateTree()
+        {
+            GetProcessesList();
+            var orderedProcessesByParrentId = allProcesses.OrderBy(node => node.ParrentId).ToArray();
+            for (int i = 0; i < orderedProcessesByParrentId.Length; ++i)
+            {
+                Models.ProcessTree parent = FindInTree(orderedProcessesByParrentId[i].ParrentId);
+                if ((orderedProcessesByParrentId[i].ParrentId == 0 && orderedProcessesByParrentId[i].ProcessId == 0) || parent == null)
+                {
+                    processTrees.Add(orderedProcessesByParrentId[i]);
+                }
+                else
+                {
+                    parent.ChildTree.Add(orderedProcessesByParrentId[i]);
+                }
+            }
+        }
+
+        private Models.ProcessTree FindInTree(int id)
+        {
+            Models.ProcessTree finded = null;
+            foreach (Models.ProcessTree node in allProcesses)
+            {
+                if (node.ProcessId.Equals(id))
+                {
+                    finded = node;
+                    break;
+                }
+                else if (node.ChildTree.Count != 0)
+                {
+                    finded = FindInNode(node, id);
+                    if (finded != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return finded;
+        }
+
+        private Models.ProcessTree FindInNode(Models.ProcessTree node, int id)
+        {
+            Models.ProcessTree finded = null;
+            foreach (Models.ProcessTree child in node.ChildTree)
+            {
+                if (child.ProcessId.Equals(id))
+                {
+                    finded = child;
+                    break;
+                }
+                else if (child.ChildTree.Count != 0)
+                {
+                    finded = FindInNode(child, id);
+                    if (finded != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return finded;
+        }
+
+        private void GetProcessesList()
         {
             var proc = NativeMethods.CreateToolhelp32Snapshot(SnapshotFlags.Process, 0);
 
@@ -49,35 +87,33 @@ namespace ProcessTree.ViewModels
             {
                 do
                 {
-                    if (!GetAllParrentIds().Contains(entry.th32ParentProcessID))
-                    {
-                        AddParrentId(entry.th32ParentProcessID);
-                        AddProcessTree(new Models.ProcessTree(entry.szExeFile, entry.th32ProcessID, entry.th32ParentProcessID));
-                    }
-                    else
-                    {
-                        AddChildProcessTree(entry.th32ParentProcessID, new Models.ProcessTree(entry.szExeFile, entry.th32ProcessID, entry.th32ParentProcessID));
-                    }
+                    allProcesses.Add(new Models.ProcessTree(entry));
                 } while (NativeMethods.Process32Next(proc, ref entry));
             }
-
             NativeMethods.CloseHandle(proc);
         }
 
-        public IEnumerable<uint> GetAllParrentIds()
+        public IEnumerable<Models.ProcessTree> GetProcessTree()
         {
-            return parrentIds;
-        }
-
-        public IEnumerable<Models.ProcessTree> GetProcessTrees()
-        {
+            CreateTree();
             return processTrees;
         }
 
-        public void RefreshTrees()
+        public void StartProcess(string name)
+        {
+            Process.Start(name);
+        }
+
+        public void CloseProcess(int Id)
+        {
+            Process currentProcess = Process.GetProcessById(Id);
+            currentProcess.Kill();
+        }
+
+        public void RefreshTree()
         {
             processTrees.Clear();
-            parrentIds.Clear();
+            allProcesses.Clear();
             CreateTree();
         }
     }

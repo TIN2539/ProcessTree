@@ -2,6 +2,7 @@
 using ProcessTree.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -13,7 +14,7 @@ namespace ProcessTree.ViewModels
     {
         private readonly IProcessTreeManager treeManager;
         private string processName = string.Empty;
-        private object selectedProcess;
+        private Models.ProcessTree selectedProcess;
         private readonly Command refreshCommand;
         private readonly Command startProcessCommand;
         private readonly Command stopProcessCommand;
@@ -28,15 +29,13 @@ namespace ProcessTree.ViewModels
 
         private void RefreshList()
         {
-            treeManager.RefreshTrees();
+            treeManager.RefreshTree();
         }
 
         private void StopProcess()
         {
-            int processId = (int)((Models.ProcessTree)SelectedProcess).ProcessId;
-            Process currentProcess = Process.GetProcessById(processId);
-            currentProcess.Kill();
-            treeManager.RefreshTrees();
+            treeManager.CloseProcess(selectedProcess.ProcessId);
+            treeManager.RefreshTree();
         }
 
         private void StartProcess()
@@ -66,9 +65,9 @@ namespace ProcessTree.ViewModels
             set => SetProperty(ref processName, value);
         }
 
-        public IEnumerable<Models.ProcessTree> ProcessTrees => treeManager.GetProcessTrees();
+        public IEnumerable<Models.ProcessTree> ProcessesTree => treeManager.GetProcessTree();
 
-        public object SelectedProcess
+        public Models.ProcessTree SelectedProcess
         {
             get => selectedProcess;
             set => SetProperty(ref selectedProcess, value);
