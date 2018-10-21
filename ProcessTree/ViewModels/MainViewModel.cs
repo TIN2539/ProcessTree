@@ -35,6 +35,7 @@ namespace ProcessTree.ViewModels
                 int processId = (int)((Models.ProcessTree)SelectedProcess).ProcessId;
                 Process currentProcess = Process.GetProcessById(processId);
                 currentProcess.Kill();
+                treeManager.RefreshTrees();
             });
             Refresh = new DelegateCommand(() => treeManager.RefreshTrees());
         }
