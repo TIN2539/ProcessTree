@@ -4,14 +4,14 @@ namespace ProcessTree.ViewModels
 {
     public interface IProcessTreeManager
     {
-        void StartProcess(string name);
+        void CloseProcess(int id);
+
+        void CreateTree();
 
         IEnumerable<Models.ProcessTree> GetProcessTree();
 
-        void CloseProcess(int Id);
-
         void RefreshTree();
 
-        void CreateTree();
+        void StartProcess(string name);
     }
 }

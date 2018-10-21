@@ -12,21 +12,21 @@ namespace ProcessTree.Utilities
             return true;
         }
 
-        public abstract void Execute();
-
-        public virtual void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-
         bool ICommand.CanExecute(object parameter)
         {
             return CanExecute();
         }
 
+        public abstract void Execute();
+
         void ICommand.Execute(object parameter)
         {
             Execute();
+        }
+
+        public virtual void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

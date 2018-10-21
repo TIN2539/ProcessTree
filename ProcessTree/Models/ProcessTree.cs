@@ -5,10 +5,10 @@ namespace ProcessTree.Models
 {
     public class ProcessTree
     {
+        private readonly ICollection<ProcessTree> childTree = new ObservableCollection<ProcessTree>();
         private readonly int parrentId;
         private readonly int processId;
         private readonly string processName;
-        private readonly ICollection<ProcessTree> childTree = new ObservableCollection<ProcessTree>();
 
         public ProcessTree(ProcessEntry32 process)
         {
@@ -16,6 +16,7 @@ namespace ProcessTree.Models
             processId = (int)process.th32ProcessID;
             parrentId = (int)process.th32ParentProcessID;
         }
+
         public ICollection<ProcessTree> ChildTree => childTree;
 
         public int ParrentId => parrentId;

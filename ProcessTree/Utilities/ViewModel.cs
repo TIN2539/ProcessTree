@@ -23,6 +23,7 @@ namespace ProcessTree.ViewModels
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
@@ -39,37 +40,19 @@ namespace ProcessTree.ViewModels
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void HandleRaiseCanExecuteDependsUpponProperties(PropertyInfo appliedProperty)
+        private IEnumerable<PropertyInfo> FindNotiFyCollectionChangedImplementProperty()
         {
-            RaiseCanExecuteDependsUponAttribute attribute = appliedProperty.GetCustomAttribute<RaiseCanExecuteDependsUponAttribute>();
-            if (attribute != null)
-            {
-                PropertyChanged += (sender, e) =>
-                {
-                    if (e.PropertyName == attribute.PropertyName)
-                    {
-                        Command command = (Command)appliedProperty.GetValue(this);
-                        command.RaiseCanExecuteChanged();
-                    }
-                };
-            }
-        }
+            ICollection<PropertyInfo> result = new List<PropertyInfo>();
 
-        private void HandleDependsUpponProperties(PropertyInfo appliedProperty)
-        {
-            IEnumerable<DependsUponPropertyAttribute> attributes = appliedProperty.GetCustomAttributes<DependsUponPropertyAttribute>();
-            foreach (DependsUponPropertyAttribute attribute in attributes)
+            foreach (PropertyInfo property in properties)
             {
-                PropertyChanged += (sender, e) =>
+                if (property.GetValue(this) is INotifyCollectionChanged)
                 {
-                    if (e.PropertyName == attribute.PropertyName)
-                    {
-                        OnPropertyChanged(new PropertyChangedEventArgs(appliedProperty.Name));
-                    }
-                };
+                    result.Add(property);
+                }
             }
+
+            return result;
         }
 
         private void HandleDependsUpponCollectionAttribute(PropertyInfo appliedProperty)
@@ -91,19 +74,19 @@ namespace ProcessTree.ViewModels
             }
         }
 
-        private IEnumerable<PropertyInfo> FindNotiFyCollectionChangedImplementProperty()
+        private void HandleDependsUpponProperties(PropertyInfo appliedProperty)
         {
-            ICollection<PropertyInfo> result = new List<PropertyInfo>();
-
-            foreach (PropertyInfo property in properties)
+            IEnumerable<DependsUponPropertyAttribute> attributes = appliedProperty.GetCustomAttributes<DependsUponPropertyAttribute>();
+            foreach (DependsUponPropertyAttribute attribute in attributes)
             {
-                if (property.GetValue(this) is INotifyCollectionChanged)
+                PropertyChanged += (sender, e) =>
                 {
-                    result.Add(property);
-                }
+                    if (e.PropertyName == attribute.PropertyName)
+                    {
+                        OnPropertyChanged(new PropertyChangedEventArgs(appliedProperty.Name));
+                    }
+                };
             }
-
-            return result;
         }
 
         private void HandlePropertiesAttributes(PropertyInfo appliedProperty)
@@ -111,6 +94,22 @@ namespace ProcessTree.ViewModels
             HandleDependsUpponProperties(appliedProperty);
             HandleRaiseCanExecuteDependsUpponProperties(appliedProperty);
             HandleDependsUpponCollectionAttribute(appliedProperty);
+        }
+
+        private void HandleRaiseCanExecuteDependsUpponProperties(PropertyInfo appliedProperty)
+        {
+            RaiseCanExecuteDependsUponAttribute attribute = appliedProperty.GetCustomAttribute<RaiseCanExecuteDependsUponAttribute>();
+            if (attribute != null)
+            {
+                PropertyChanged += (sender, e) =>
+                {
+                    if (e.PropertyName == attribute.PropertyName)
+                    {
+                        Command command = (Command)appliedProperty.GetValue(this);
+                        command.RaiseCanExecuteChanged();
+                    }
+                };
+            }
         }
     }
 }

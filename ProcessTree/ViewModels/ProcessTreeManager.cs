@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ProcessTree.Models;
 
 namespace ProcessTree.ViewModels
 {
     public class ProcessTreeManager : IProcessTreeManager
     {
-        private ICollection<Models.ProcessTree> processTrees = new ObservableCollection<Models.ProcessTree>();
         private ICollection<Models.ProcessTree> allProcesses = new List<Models.ProcessTree>();
+        private ICollection<Models.ProcessTree> processTrees = new ObservableCollection<Models.ProcessTree>();
 
+        public void CloseProcess(int Id)
+        {
+            Process currentProcess = Process.GetProcessById(Id);
+            currentProcess.Kill();
+        }
 
         public void CreateTree()
         {
@@ -32,26 +35,22 @@ namespace ProcessTree.ViewModels
             }
         }
 
-        private Models.ProcessTree FindInTree(int id)
+        public IEnumerable<Models.ProcessTree> GetProcessTree()
         {
-            Models.ProcessTree finded = null;
-            foreach (Models.ProcessTree node in allProcesses)
-            {
-                if (node.ProcessId.Equals(id))
-                {
-                    finded = node;
-                    break;
-                }
-                else if (node.ChildTree.Count != 0)
-                {
-                    finded = FindInNode(node, id);
-                    if (finded != null)
-                    {
-                        break;
-                    }
-                }
-            }
-            return finded;
+            CreateTree();
+            return processTrees;
+        }
+
+        public void RefreshTree()
+        {
+            processTrees.Clear();
+            allProcesses.Clear();
+            CreateTree();
+        }
+
+        public void StartProcess(string name)
+        {
+            Process.Start(name);
         }
 
         private Models.ProcessTree FindInNode(Models.ProcessTree node, int id)
@@ -76,6 +75,28 @@ namespace ProcessTree.ViewModels
             return finded;
         }
 
+        private Models.ProcessTree FindInTree(int id)
+        {
+            Models.ProcessTree finded = null;
+            foreach (Models.ProcessTree node in allProcesses)
+            {
+                if (node.ProcessId.Equals(id))
+                {
+                    finded = node;
+                    break;
+                }
+                else if (node.ChildTree.Count != 0)
+                {
+                    finded = FindInNode(node, id);
+                    if (finded != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return finded;
+        }
+
         private void GetProcessesList()
         {
             var proc = NativeMethods.CreateToolhelp32Snapshot(SnapshotFlags.Process, 0);
@@ -91,30 +112,6 @@ namespace ProcessTree.ViewModels
                 } while (NativeMethods.Process32Next(proc, ref entry));
             }
             NativeMethods.CloseHandle(proc);
-        }
-
-        public IEnumerable<Models.ProcessTree> GetProcessTree()
-        {
-            CreateTree();
-            return processTrees;
-        }
-
-        public void StartProcess(string name)
-        {
-            Process.Start(name);
-        }
-
-        public void CloseProcess(int Id)
-        {
-            Process currentProcess = Process.GetProcessById(Id);
-            currentProcess.Kill();
-        }
-
-        public void RefreshTree()
-        {
-            processTrees.Clear();
-            allProcesses.Clear();
-            CreateTree();
         }
     }
 }

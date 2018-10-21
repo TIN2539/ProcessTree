@@ -2,9 +2,6 @@
 using ProcessTree.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
@@ -12,12 +9,12 @@ namespace ProcessTree.ViewModels
 {
     public sealed class MainViewModel : ViewModel
     {
-        private readonly IProcessTreeManager treeManager;
-        private string processName = string.Empty;
-        private Models.ProcessTree selectedProcess;
         private readonly Command refreshCommand;
         private readonly Command startProcessCommand;
         private readonly Command stopProcessCommand;
+        private readonly IProcessTreeManager treeManager;
+        private string processName = string.Empty;
+        private Models.ProcessTree selectedProcess;
 
         public MainViewModel(IProcessTreeManager treeManager)
         {
@@ -27,14 +24,36 @@ namespace ProcessTree.ViewModels
             refreshCommand = new DelegateCommand(RefreshList);
         }
 
-        private void RefreshList()
+        [DependsUponProperty(nameof(ProcessName))]
+        public bool CanStartProcess => processName != string.Empty;
+
+        [DependsUponProperty(nameof(SelectedProcess))]
+        public bool CanStopProcess => selectedProcess != null;
+
+        public IEnumerable<Models.ProcessTree> ProcessesTree => treeManager.GetProcessTree();
+
+        public string ProcessName
         {
-            treeManager.RefreshTree();
+            get => processName;
+            set => SetProperty(ref processName, value);
         }
 
-        private void StopProcess()
+        public ICommand RefreshCommand => refreshCommand;
+
+        public Models.ProcessTree SelectedProcess
         {
-            treeManager.CloseProcess(selectedProcess.ProcessId);
+            get => selectedProcess;
+            set => SetProperty(ref selectedProcess, value);
+        }
+
+        [RaiseCanExecuteDependsUpon(nameof(CanStartProcess))]
+        public ICommand StartProcessCommand => startProcessCommand;
+
+        [RaiseCanExecuteDependsUpon(nameof(CanStopProcess))]
+        public ICommand StopProcessCommand => stopProcessCommand;
+
+        private void RefreshList()
+        {
             treeManager.RefreshTree();
         }
 
@@ -53,32 +72,10 @@ namespace ProcessTree.ViewModels
             ProcessName = string.Empty;
         }
 
-        [DependsUponProperty(nameof(ProcessName))]
-        public bool CanStartProcess => processName != string.Empty;
-
-        [DependsUponProperty(nameof(SelectedProcess))]
-        public bool CanStopProcess => selectedProcess != null;
-
-        public string ProcessName
+        private void StopProcess()
         {
-            get => processName;
-            set => SetProperty(ref processName, value);
+            treeManager.CloseProcess(selectedProcess.ProcessId);
+            treeManager.RefreshTree();
         }
-
-        public IEnumerable<Models.ProcessTree> ProcessesTree => treeManager.GetProcessTree();
-
-        public Models.ProcessTree SelectedProcess
-        {
-            get => selectedProcess;
-            set => SetProperty(ref selectedProcess, value);
-        }
-
-        public ICommand RefreshCommand => refreshCommand;
-
-        [RaiseCanExecuteDependsUpon(nameof(CanStartProcess))]
-        public ICommand StartProcessCommand => startProcessCommand;
-
-        [RaiseCanExecuteDependsUpon(nameof(CanStopProcess))]
-        public ICommand StopProcessCommand => stopProcessCommand;
     }
 }
