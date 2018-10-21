@@ -14,9 +14,9 @@ namespace ProcessTree.Utilities
 
         public abstract void Execute();
 
-        protected virtual void OnCanExecuteChanged(EventArgs e)
+        public virtual void RaiseCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, e);
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
         bool ICommand.CanExecute(object parameter)

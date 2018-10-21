@@ -9,7 +9,8 @@ namespace ProcessTree
         {
             base.OnStartup(e);
 
-            var viewModel = new MainViewModel();
+            var treeManager = new ProcessTreeManager();
+            var viewModel = new MainViewModel(treeManager);
             var view = new MainWindow(viewModel);
 
             view.Show();

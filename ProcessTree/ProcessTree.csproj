@@ -72,13 +72,16 @@
     <Compile Include="Marshaling\NativeMethods.cs" />
     <Compile Include="Marshaling\ProcessEntry32.cs" />
     <Compile Include="Marshaling\SnapshotFlags.cs" />
-    <Compile Include="Utilities\Command.cs" />
-    <Compile Include="Utilities\DelegateCommand.cs" />
+    <Compile Include="Utilities\Commands\Command.cs" />
+    <Compile Include="Utilities\Commands\DelegateCommand.cs" />
+    <Compile Include="Utilities\Attributes\DependsUponCollectionAttribute.cs" />
+    <Compile Include="Utilities\Attributes\DependsUponPropertyAttribute.cs" />
+    <Compile Include="Utilities\Attributes\RaiseCanExecuteDependsUponAttribute.cs" />
     <Compile Include="ViewModels\BindableTreeView.cs" />
     <Compile Include="ViewModels\IProcessTreeManager.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ProcessTreeManager.cs" />
-    <Compile Include="ViewModels\ViewModel.cs" />
+    <Compile Include="Utilities\ViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
