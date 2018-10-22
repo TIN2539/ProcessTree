@@ -13,8 +13,15 @@ namespace ProcessTree.ViewModels
 
         public void CloseProcess(int Id)
         {
-            Process currentProcess = Process.GetProcessById(Id);
-            currentProcess.Kill();
+            try
+            {
+                Process currentProcess = Process.GetProcessById(Id);
+                currentProcess.Kill();
+            }
+            catch
+            {
+                //Do nothing.
+            }
         }
 
         public void CreateTree()
