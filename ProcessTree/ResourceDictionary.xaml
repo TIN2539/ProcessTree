@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ProcessTree.Models">
+    <HierarchicalDataTemplate DataType="{x:Type local:ProcessTree}" ItemsSource="{Binding Path=ChildTree}">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Path=ProcessName}" FontWeight="Black" />
+            <TextBlock Text=" (" />
+            <TextBlock Text="{Binding Path=ProcessId}" />
+            <TextBlock Text=")" />
+        </StackPanel>
+    </HierarchicalDataTemplate>
+</ResourceDictionary>
