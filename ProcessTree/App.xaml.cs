@@ -1,6 +1,5 @@
 ﻿using Ninject;
 using Ninject.Extensions.Conventions;
-using ProcessTree.ViewModels;
 using System.Windows;
 
 namespace ProcessTree

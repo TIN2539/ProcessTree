@@ -4,7 +4,7 @@ namespace ProcessTree.ViewModels
 {
     public interface IProcessTreeManager
     {
-        void CloseProcess(int id);
+        void CloseProcess(Models.ProcessTree process);
 
         void CreateTree();
 

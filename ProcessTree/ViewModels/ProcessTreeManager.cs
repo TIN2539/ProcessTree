@@ -11,17 +11,11 @@ namespace ProcessTree.ViewModels
         private ICollection<Models.ProcessTree> allProcesses = new List<Models.ProcessTree>();
         private ICollection<Models.ProcessTree> processTrees = new ObservableCollection<Models.ProcessTree>();
 
-        public void CloseProcess(int Id)
+        public void CloseProcess(Models.ProcessTree selectedProcess)
         {
-            try
-            {
-                Process currentProcess = Process.GetProcessById(Id);
-                currentProcess.Kill();
-            }
-            catch
-            {
-                //Do nothing.
-            }
+            Process currentProcess = Process.GetProcessById(selectedProcess.ProcessId);
+            currentProcess.Kill();
+            RemoveSelectedItem(selectedProcess);
         }
 
         public void CreateTree()
@@ -58,6 +52,22 @@ namespace ProcessTree.ViewModels
         public void StartProcess(string name)
         {
             Process.Start(name);
+        }
+
+        private void FindInChild(Models.ProcessTree selectedProcess, ICollection<Models.ProcessTree> child)
+        {
+            foreach (Models.ProcessTree process in child)
+            {
+                if (process == selectedProcess)
+                {
+                    child.Remove(process);
+                    break;
+                }
+                else if (process.ChildTree.Count > 0)
+                {
+                    FindInChild(selectedProcess, process.ChildTree);
+                }
+            }
         }
 
         private Models.ProcessTree FindInNode(Models.ProcessTree node, int id)
@@ -119,6 +129,30 @@ namespace ProcessTree.ViewModels
                 } while (NativeMethods.Process32Next(proc, ref entry));
             }
             NativeMethods.CloseHandle(proc);
+        }
+
+        private void RemoveSelectedItem(Models.ProcessTree selectedProcess)
+        {
+            var deleted = false;
+            foreach (Models.ProcessTree process in processTrees)
+            {
+                if (process == selectedProcess)
+                {
+                    processTrees.Remove(process);
+                    deleted = true;
+                    break;
+                }
+            }
+            if (!deleted)
+            {
+                foreach (Models.ProcessTree process in processTrees)
+                {
+                    if (process.ChildTree.Count > 0)
+                    {
+                        FindInChild(selectedProcess, process.ChildTree);
+                    }
+                }
+            }
         }
     }
 }

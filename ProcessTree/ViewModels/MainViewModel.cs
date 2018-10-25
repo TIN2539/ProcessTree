@@ -74,7 +74,7 @@ namespace ProcessTree.ViewModels
 
         private void StopProcess()
         {
-            treeManager.CloseProcess(selectedProcess.ProcessId);
+            treeManager.CloseProcess(selectedProcess);
         }
     }
 }
